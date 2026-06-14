@@ -27,8 +27,17 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // refreshing the auth token
-  await supabase.auth.getUser()
+  // Check auth token
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Protect agent and monitor routes
+  const isProtectedRoute = request.nextUrl.pathname.startsWith('/agent') || request.nextUrl.pathname.startsWith('/monitor') || request.nextUrl.pathname.startsWith('/dashboard')
+  
+  if (!user && isProtectedRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
 
   return supabaseResponse
 }

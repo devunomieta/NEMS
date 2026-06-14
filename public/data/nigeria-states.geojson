@@ -1,0 +1,27 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "admin1Name": "Lagos",
+        "state_name": "Lagos"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[3.3, 6.5], [3.4, 6.5], [3.4, 6.6], [3.3, 6.6], [3.3, 6.5]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "admin1Name": "Kano",
+        "state_name": "Kano"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[8.5, 12.0], [8.6, 12.0], [8.6, 12.1], [8.5, 12.1], [8.5, 12.0]]]
+      }
+    }
+  ]
+}

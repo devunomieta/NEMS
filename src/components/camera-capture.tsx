@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 interface CameraCaptureProps {
   onCapture: (file: File) => void
   onCancel?: () => void
+  mode?: 'photo' | 'live'
 }
 
-export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
+export function CameraCapture({ onCapture, onCancel, mode = 'photo' }: CameraCaptureProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   
@@ -17,12 +18,25 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
   const [photoData, setPhotoData] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const streamRef = useRef<MediaStream | null>(null)
+
   const startCamera = useCallback(async () => {
     try {
-      setError(null)
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "environment" } 
-      })
+      let mediaStream;
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: "environment" },
+          audio: mode === 'live'
+        })
+      } catch (e) {
+        // Fallback to any available camera
+        mediaStream = await navigator.mediaDevices.getUserMedia({ 
+          video: true,
+          audio: mode === 'live'
+        })
+      }
+      
+      streamRef.current = mediaStream
       setStream(mediaStream)
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream
@@ -31,15 +45,19 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
       setError("Unable to access camera. Please check permissions.")
       console.error("Camera error:", err)
     }
-  }, [])
+  }, [mode])
 
   // Start camera on mount
   React.useEffect(() => {
-    startCamera()
+    // Avoid synchronous state updates in effect
+    setTimeout(() => {
+      startCamera()
+    }, 0)
+    
     return () => {
       // Cleanup stream on unmount
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop())
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop())
       }
     }
   }, [startCamera])
@@ -100,6 +118,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
               className="object-cover w-full h-full"
             />
           ) : (
+            /* eslint-disable-next-line @next/next/no-img-element */
             <img 
               src={photoData} 
               alt="Captured photo" 
@@ -111,36 +130,38 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
         </div>
       )}
 
-      <div className="flex w-full gap-2 justify-center">
-        {!photoData ? (
-          <>
-            {onCancel && (
-              <Button variant="outline" size="icon" onClick={onCancel} className="rounded-full w-12 h-12">
-                <X className="h-5 w-5" />
+      {mode === 'photo' && (
+        <div className="flex w-full gap-2 justify-center mt-4">
+          {!photoData ? (
+            <>
+              {onCancel && (
+                <Button variant="outline" size="icon" onClick={onCancel} className="rounded-full w-12 h-12">
+                  <X className="h-5 w-5" />
+                </Button>
+              )}
+              <Button 
+                size="icon" 
+                onClick={takePhoto} 
+                disabled={!!error || !stream}
+                className="rounded-full w-16 h-16 border-4 border-white/20 shadow-xl"
+              >
+                <Camera className="h-6 w-6" />
               </Button>
-            )}
-            <Button 
-              size="icon" 
-              onClick={takePhoto} 
-              disabled={!!error || !stream}
-              className="rounded-full w-16 h-16 border-4 border-white/20 shadow-xl"
-            >
-              <Camera className="h-6 w-6" />
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button variant="outline" onClick={retakePhoto} className="flex-1">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Retake
-            </Button>
-            <Button onClick={confirmPhoto} className="flex-1">
-              <Check className="mr-2 h-4 w-4" />
-              Use Photo
-            </Button>
-          </>
-        )}
-      </div>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={retakePhoto} className="flex-1">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Retake
+              </Button>
+              <Button onClick={confirmPhoto} className="flex-1">
+                <Check className="mr-2 h-4 w-4" />
+                Use Photo
+              </Button>
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }

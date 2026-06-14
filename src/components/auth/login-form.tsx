@@ -21,19 +21,31 @@ export function LoginForm() {
     e.preventDefault()
     setIsLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
-    if (error) {
-      toast.error(error.message)
+    if (error || !data.user) {
+      toast.error(error?.message || "Login failed")
       setIsLoading(false)
       return
     }
 
+    // Fetch user role to determine where to redirect
+    const { data: userData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', data.user.id)
+      .single()
+
+    let nextRoute = "/agent"
+    if (userData?.role === 'superadmin') nextRoute = "/superadmin"
+    else if (userData?.role === 'admin') nextRoute = "/admin"
+    else if (userData?.role === 'monitor') nextRoute = "/monitor"
+
     toast.success("Successfully logged in!")
-    router.push("/dashboard")
+    router.push(nextRoute)
     router.refresh()
   }
 
@@ -42,7 +54,7 @@ export function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        redirectTo: `${window.location.origin}/auth/callback?next=auto`,
       },
     })
     
@@ -113,6 +125,45 @@ export function LoginForm() {
           >
             Google
           </Button>
+          
+          <div className="mt-6 p-4 rounded-lg bg-muted/50 border border-border/50 text-sm">
+            <h4 className="font-semibold mb-3 flex items-center justify-between text-muted-foreground">
+              Demo Accounts
+              <span className="text-xs font-normal opacity-70">Click to autofill</span>
+            </h4>
+            <div className="space-y-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="w-full justify-start h-auto py-2"
+                onClick={() => {
+                  setEmail('agent1@nems.demo')
+                  setPassword('Demo@2027!')
+                }}
+              >
+                <div className="flex flex-col items-start text-left">
+                  <span className="font-medium">Agent</span>
+                  <span className="text-xs text-muted-foreground font-mono">agent1@nems.demo / Demo@2027!</span>
+                </div>
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="w-full justify-start h-auto py-2"
+                onClick={() => {
+                  setEmail('monitor1@nems.demo')
+                  setPassword('Demo@2027!')
+                }}
+              >
+                <div className="flex flex-col items-start text-left">
+                  <span className="font-medium">Monitor</span>
+                  <span className="text-xs text-muted-foreground font-mono">monitor1@nems.demo / Demo@2027!</span>
+                </div>
+              </Button>
+            </div>
+          </div>
         </CardFooter>
       </form>
     </Card>

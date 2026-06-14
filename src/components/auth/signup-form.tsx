@@ -14,7 +14,6 @@ export function SignupForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
   const supabase = createClient()
 
   async function onSubmit(e: React.FormEvent) {

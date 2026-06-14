@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 
 export function CTA() {
   return (
@@ -19,16 +19,12 @@ export function CTA() {
             Join thousands of observers tracking the process in real-time. Transparent, secure, and accessible to everyone.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-4">
-            <Button asChild size="lg" variant="secondary" className="h-14 px-8 text-lg font-bold shadow-xl hover:scale-105 transition-transform text-primary">
-              <Link href="/dashboard">
-                View Live Dashboard
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="h-14 px-8 text-lg font-bold border-primary-foreground/20 text-primary-foreground bg-primary-foreground/10 hover:bg-primary-foreground/20 hover:scale-105 transition-transform">
-              <Link href="/login">
-                Agent Login
-              </Link>
-            </Button>
+            <Link href="/dashboard" className={buttonVariants({ size: "lg", variant: "secondary", className: "h-14 px-8 text-lg font-bold shadow-xl hover:scale-105 transition-transform text-primary" })}>
+              View Live Dashboard
+            </Link>
+            <Link href="/login" className={buttonVariants({ size: "lg", variant: "outline", className: "h-14 px-8 text-lg font-bold border-primary-foreground/20 text-primary-foreground bg-primary-foreground/10 hover:bg-primary-foreground/20 hover:scale-105 transition-transform" })}>
+              Agent Login
+            </Link>
           </div>
         </div>
       </div>

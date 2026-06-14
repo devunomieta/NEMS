@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nigeria Election Monitoring System (NEMS)
 
-## Getting Started
+NEMS is a secure, real-time web platform built for transparent election observation in Nigeria, particularly focused on the 2027 General Elections. It aggregates hybrid inputs (live video feeds, recorded media, and text results) from polling units across all 36 states and the FCT.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Public Dashboard**: Real-time aggregation of results from 176,846 polling units. Includes interactive map, live feed gallery, and result charts.
+- **Polling Agent Module**: Agents can submit election results (Form EC8A), upload BVAS evidence, report incidents, and go live.
+- **Monitoring & Admin Control Room**: Cross-verify submitted data using OCR, flag anomalies, and approve results before public broadcasting.
+- **Superadmin Dashboard**: Oversee the entire system, manage users, monitor API rates, and review security audit logs.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend**: Next.js 16 (App Router), React, TypeScript
+- **Styling**: Tailwind CSS v4, `shadcn/ui`, Lucide Icons
+- **Mapping & Charts**: React-Leaflet, Recharts
+- **Backend & Auth**: Supabase (PostgreSQL, Realtime, Edge Functions, Auth)
+- **Deployment**: Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Running Locally
 
-## Learn More
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Copy `.env.local` and add your Supabase credentials.
+4. Run the development server: `npm run dev`
+5. Open [http://localhost:3000](http://localhost:3000)
 
-To learn more about Next.js, take a look at the following resources:
+## Database Setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Run the SQL migration scripts in the `supabase/` directory in the following order using the Supabase SQL Editor:
+1. `001_schema.sql`
+2. `002_rls_policies.sql`
+3. `003_seed_geography.sql`
+4. `004_seed_parties.sql`
+5. `005_seed_users.sql`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Demonstration Credentials
+(Configure these within your Supabase project)
 
-## Deploy on Vercel
+- **Agent**: `agent1@nems.demo` / `Demo@2027!`
+- **Monitor**: `monitor1@nems.demo` / `Demo@2027!`
+- **Superadmin**: `superadmin@nems.demo` / `Demo@2027!`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Developed by @Devunomieta — [devunomieta.xyz](https://devunomieta.xyz)
